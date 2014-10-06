@@ -25,7 +25,9 @@ public class EditablePolygon {
         Coordinate[] coordinates = ((Geometry) feature.getDefaultGeometry())
                 .getCoordinates();
         OrderedEditableCoordinate last = null;
-        for (Coordinate coordinate : coordinates) {
+        // We jump the repeated last coordinate
+        for (int i = 0; i < coordinates.length - 1; i++) {
+            Coordinate coordinate = coordinates[i];
             OrderedEditableCoordinate linkedCoordinate = new OrderedEditableCoordinate(
                     coordinate);
             if (last == null) {
@@ -33,10 +35,12 @@ public class EditablePolygon {
                 last = linkedCoordinate;
             } else {
                 last.linkNext(linkedCoordinate);
+                linkedCoordinate.linkPrevious(last);
                 last = linkedCoordinate;
             }
         }
         last.linkNext(firstCoordinate);
+        firstCoordinate.linkPrevious(last);
     }
 
     public OrderedEditableCoordinate getFirstCoordinate() {
@@ -44,9 +48,10 @@ public class EditablePolygon {
     }
 
     public void save() throws IOException {
-        SimpleFeature boh = featureWriter.next();
-        boh.setAttributes(feature.getAttributes());
-        boh.setDefaultGeometry(buildPolygon());
+        SimpleFeature feature = featureWriter.next();
+        feature.setAttributes(this.feature.getAttributes());
+        feature.setDefaultGeometry(buildPolygon());
+        featureWriter.write();
     }
 
     private Object buildPolygon() {
@@ -56,6 +61,7 @@ public class EditablePolygon {
             ring.add(currentCoordinate.getCoordinate());
             currentCoordinate = currentCoordinate.next();
         } while (currentCoordinate != firstCoordinate);
+        ring.add(ring.get(0));
 
         GeometryFactory gf = new GeometryFactory();
         LinearRing linearRing = gf.createLinearRing(ring

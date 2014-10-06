@@ -13,15 +13,16 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class Reference {
 
-    private int tolerance;
-    private ArrayList<Geometry> geometries = new ArrayList<Geometry>();
+    private ArrayList<LineString> geometries = new ArrayList<LineString>();
 
-    public Reference(String shapePath, int tolerance)
-            throws MalformedURLException, IOException {
-        this.tolerance = tolerance;
+    public Reference(String shapePath) throws MalformedURLException,
+            IOException {
 
         ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
         FileDataStore dataStore = dataStoreFactory.createDataStore(new File(
@@ -30,8 +31,11 @@ public class Reference {
                 .getFeatures().features();
         while (features.hasNext()) {
             SimpleFeature feature = features.next();
-            Geometry geometry = (Geometry) feature.getDefaultGeometry();
-            geometries.add(geometry);
+            MultiPolygon geometry = (MultiPolygon) feature.getDefaultGeometry();
+            for (int i = 0; i < geometry.getNumGeometries(); i++) {
+                Polygon polygon = (Polygon) geometry.getGeometryN(i);
+                geometries.add(polygon.getExteriorRing());
+            }
         }
         features.close();
         dataStore.dispose();
@@ -52,7 +56,7 @@ public class Reference {
             }
         }
 
-        if (min < tolerance) {
+        if (min < Adjuster.TOLERANCE) {
             return closestPoint(coordinate, argMin);
         } else {
             return null;
@@ -70,7 +74,7 @@ public class Reference {
             double distance = point.distance(coordinate.getCoordinate());
             if (distance < min) {
                 min = distance;
-                argMin = new CoordinateInLine(geometry, point, ring, i,
+                argMin = new CoordinateInLine(point, ring, i,
                         !ring[i].equals(point));
             }
         }

@@ -52,7 +52,6 @@ public class Adjusting {
     }
 
     public void write() throws IOException {
-        outputFeatureWriter.write();
         transaction.commit();
         dataStore.dispose();
         outputDataStore.dispose();

@@ -4,6 +4,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class OrderedEditableCoordinate {
 
+    public enum Direction {
+        NEXT, PREVIOUS
+    }
+
+    private OrderedEditableCoordinate previous;
     private OrderedEditableCoordinate next;
     private Coordinate coordinate;
 
@@ -15,29 +20,32 @@ public class OrderedEditableCoordinate {
         this.coordinate = closest.getCoordinate();
     }
 
-    public OrderedEditableCoordinate append(Coordinate... coordinates) {
-        OrderedEditableCoordinate last = this;
-        OrderedEditableCoordinate appendNext = this.next();
-        for (Coordinate coordinate : coordinates) {
-            OrderedEditableCoordinate linkedCoordinate = new OrderedEditableCoordinate(
-                    coordinate);
-            last.linkNext(linkedCoordinate);
-            last = linkedCoordinate;
-        }
-        last.linkNext(appendNext);
-        return last;
-    }
-
     public OrderedEditableCoordinate next() {
         return next;
+    }
+
+    public OrderedEditableCoordinate previous() {
+        return previous;
     }
 
     public void linkNext(OrderedEditableCoordinate next) {
         this.next = next;
     }
 
+    public void linkPrevious(OrderedEditableCoordinate previous) {
+        this.previous = previous;
+    }
+
     public Coordinate getCoordinate() {
         return coordinate;
+    }
+
+    public OrderedEditableCoordinate sibling(Direction direction) {
+        if (direction == Direction.NEXT) {
+            return next();
+        } else {
+            return previous();
+        }
     }
 
 }
