@@ -22,45 +22,74 @@ public class CoordinateInLine {
 		return point;
 	}
 
-	public void appendNeighbors(OrderedEditableCoordinate coordinate) {
+	public void appendNeighbors(OrderedEditableCoordinate c1,
+			OrderedEditableCoordinate c2) {
+		OrderedEditableCoordinate segmentStart = c1;
 
-		// forwards
-		int i = index;
-		do {
-			i++;
-			if (i >= ring.length) {
-				i = 1;
-			}
-		} while (insertOnOneSegment(coordinate, i));
-
-		// backwards
-		if (after) {
-			i = index + 1;
+		if (forward(c1, c2)) {
+			// forwards
+			int i = index;
+			do {
+				i = nextIndex(i);
+			} while ((segmentStart = insert(segmentStart, c2, ring[i])) != null);
 		} else {
-			i = index;
-		}
-		do {
-			i--;
-			if (i < 0) {
-				i = ring.length - 2;
+			// backwards
+			int i;
+			if (after) {
+				i = index + 1;
+			} else {
+				i = index;
 			}
-		} while (insertOnOneSegment(coordinate, i));
+			do {
+				i = previousIndex(i);
+			} while ((segmentStart = insert(segmentStart, c2, ring[i])) != null);
+		}
 	}
 
-	private boolean insertOnOneSegment(OrderedEditableCoordinate coordinate,
-			int i) {
-		boolean insertion = insert(coordinate.previous(), coordinate, ring[i]);
-		insertion = insert(coordinate, coordinate.next(), ring[i]) || insertion;
+	private boolean forward(OrderedEditableCoordinate c1,
+			OrderedEditableCoordinate c2) {
+		double xAxisAngle = new LineSegment(c1.getCoordinate(),
+				c2.getCoordinate()).angle();
+		double forwardAngle = new LineSegment(ring[index],
+				ring[nextIndex(index)]).angle();
+		double backwardAngle = new LineSegment(ring[index],
+				ring[previousIndex(index)]).angle();
 
-		return insertion;
+		double forwardDistance = angleDistance(
+				Math.min(xAxisAngle, forwardAngle),
+				Math.max(xAxisAngle, forwardAngle));
+		double backwardDistance = angleDistance(
+				Math.min(xAxisAngle, backwardAngle),
+				Math.max(xAxisAngle, backwardAngle));
+		return forwardDistance < backwardDistance;
 	}
 
-	private boolean insert(OrderedEditableCoordinate c1,
+	public static double angleDistance(double min, double max) {
+		return Math.min(max - min, Math.PI * 2 + min - max);
+	}
+
+	private int previousIndex(int i) {
+		i--;
+		if (i < 0) {
+			i = ring.length - 2;
+		}
+		return i;
+	}
+
+	private int nextIndex(int i) {
+		i++;
+		if (i >= ring.length) {
+			i = 1;
+		}
+		return i;
+	}
+
+	private OrderedEditableCoordinate insert(OrderedEditableCoordinate c1,
 			OrderedEditableCoordinate c2, Coordinate point) {
 
 		if (repeated(c1, OrderedEditableCoordinate.Direction.PREVIOUS, point)
 				|| repeated(c2, OrderedEditableCoordinate.Direction.NEXT, point)) {
-			return false;
+			return null;
 		}
 
 		LineSegment segment = new LineSegment(c1.getCoordinate(),
@@ -74,9 +103,9 @@ public class CoordinateInLine {
 			newCoordinate.linkNext(c2);
 			c1.linkNext(newCoordinate);
 			c2.linkPrevious(newCoordinate);
-			return true;
+			return newCoordinate;
 		} else {
-			return false;
+			return null;
 		}
 	}
 

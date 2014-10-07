@@ -16,8 +16,8 @@ public class Adjuster {
 		Reference reference = new Reference(
 				"coberturas/2006/ch06_wgs84_gkf5.shp");
 		Adjusting adjusting = new Adjusting(
-				"coberturas/2006_2011/testcase.shp", // ch_defo_otf_a_ot_2006_2011_f5wgs84_final.shp",
-				"result.shp");
+				"coberturas/2006_2011/single-testcase.shp", // ch_defo_otf_a_ot_2006_2011_f5wgs84_final.shp",
+				"single-result.shp");
 
 		while (!adjusting.eof()) {
 			EditablePolygon geom = adjusting.next();
@@ -31,7 +31,8 @@ public class Adjuster {
 				OrderedEditableCoordinate nextCoordinate = coordinate.next();
 				if (closest != null) {
 					coordinate.update(closest);
-					closest.appendNeighbors(coordinate);
+					closest.appendNeighbors(coordinate.previous(), coordinate);
+					closest.appendNeighbors(coordinate, coordinate.next());
 				}
 				coordinate = nextCoordinate;
 			} while (coordinate != firstCoordinate);
