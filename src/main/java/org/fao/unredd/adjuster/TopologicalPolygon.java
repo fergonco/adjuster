@@ -2,10 +2,13 @@ package org.fao.unredd.adjuster;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * double linked list of coordinates with no duplicated points.
+ * double linked list of coordinates with no duplicated points. the input
+ * geometry is expected to be a LinearRing, a polygon with only one ring or a
+ * multipolygon of one polygon with only one ring.
  * 
  * @author fergonco
  */
@@ -14,6 +17,14 @@ public class TopologicalPolygon {
 	private OrderedEditableCoordinate firstCoordinate;
 
 	public TopologicalPolygon(Geometry geometry) {
+		// Get the external ring of the unique polygon
+		if (geometry instanceof MultiPolygon) {
+			geometry = geometry.getGeometryN(0);
+		}
+		if (geometry instanceof Polygon) {
+			geometry = ((Polygon) geometry).getExteriorRing();
+		}
+
 		Coordinate[] coordinates = geometry.getCoordinates();
 		OrderedEditableCoordinate last = null;
 		// We jump the repeated last coordinate

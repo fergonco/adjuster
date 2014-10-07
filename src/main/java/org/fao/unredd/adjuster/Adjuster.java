@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 public class Adjuster {
-	public static final double TOLERANCE = 50;
+	public static final double TOLERANCE = 100;
 	public static final double ANGLE_TOLERANCE = 0.5;
 
 	public static void main(String[] args) throws MalformedURLException,
@@ -15,11 +15,11 @@ public class Adjuster {
 				"coberturas/2006/ch06_wgs84_gkf5.shp");
 		// Adjusting adjusting = new Adjusting(
 		// "coberturas/2006_2011/single-testcase.shp", "single-result.shp");
-		Adjusting adjusting = new Adjusting(
-				"coberturas/2006_2011/testcase.shp", "result.shp");
 		// Adjusting adjusting = new Adjusting(
-		// "coberturas/2006_2011/ch_defo_otf_a_ot_2006_2011_f5wgs84_final.shp",
-		// "result.shp");
+		// "coberturas/2006_2011/testcase.shp", "result.shp");
+		Adjusting adjusting = new Adjusting(
+				"coberturas/2006_2011/ch_defo_otf_a_ot_2006_2011_f5wgs84_final.shp",
+				"result_100.shp");
 
 		while (!adjusting.eof()) {
 			EditablePolygon geom = adjusting.next();

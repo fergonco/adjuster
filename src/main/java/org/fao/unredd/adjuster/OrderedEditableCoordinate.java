@@ -201,7 +201,8 @@ public class OrderedEditableCoordinate {
 			OrderedEditableCoordinate.Direction direction,
 			Coordinate newCoordinate) {
 		OrderedEditableCoordinate coordinate = reference;
-		while (coordinate.getCoordinate().distance(reference.getCoordinate()) < Adjuster.TOLERANCE) {
+		while (coordinate.getCoordinate().distance(reference.getCoordinate()) < Adjuster.TOLERANCE
+				&& coordinate.next() != reference) {
 			if (coordinate.getCoordinate().distance(newCoordinate) < 0.001) {
 				return true;
 			}
