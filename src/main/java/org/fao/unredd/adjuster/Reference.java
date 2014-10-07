@@ -41,7 +41,7 @@ public class Reference {
 		dataStore.dispose();
 	}
 
-	public CoordinateInLine getClosestPointInTolerance(
+	public OrderedEditableCoordinate getClosestPointInTolerance(
 			OrderedEditableCoordinate coordinate) {
 		Geometry argMin = null;
 		double min = Double.MAX_VALUE;
@@ -63,24 +63,40 @@ public class Reference {
 		}
 	}
 
-	private CoordinateInLine closestPoint(OrderedEditableCoordinate coordinate,
-			Geometry geometry) {
+	private OrderedEditableCoordinate closestPoint(
+			OrderedEditableCoordinate coordinate, Geometry geometry) {
+		TopologicalPolygon polygon = new TopologicalPolygon(geometry);
 		double min = Double.MAX_VALUE;
-		CoordinateInLine argMin = null;
-		Coordinate[] ring = geometry.getCoordinates();
-		for (int i = 0; i < ring.length - 1; i++) {
-			LineSegment segment = new LineSegment(ring[i], ring[i + 1]);
+		Coordinate coordinateArgMin = null;
+		OrderedEditableCoordinate topologicalArgMin = null;
+		OrderedEditableCoordinate currentCoordinate = polygon
+				.getFirstCoordinate();
+		do {
+			LineSegment segment = new LineSegment(
+					currentCoordinate.getCoordinate(), currentCoordinate.next()
+							.getCoordinate());
 			Coordinate point = segment.closestPoint(coordinate.getCoordinate());
 			double distance = point.distance(coordinate.getCoordinate());
 			if (distance < min) {
 				min = distance;
-				argMin = new CoordinateInLine(point, ring, i,
-						!ring[i].equals(point));
+				topologicalArgMin = currentCoordinate;
+				coordinateArgMin = point;
 			}
-		}
 
-		if (argMin != null) {
-			return argMin;
+			currentCoordinate = currentCoordinate.next();
+		} while (currentCoordinate != polygon.getFirstCoordinate());
+
+		if (coordinateArgMin != null) {
+			if (topologicalArgMin.getCoordinate().distance(coordinateArgMin) < 0.0001) {
+				return topologicalArgMin;
+			} else if (topologicalArgMin.next().getCoordinate()
+					.distance(coordinateArgMin) < 0.0001) {
+				return topologicalArgMin.next();
+			} else {
+				return topologicalArgMin.insert(
+						OrderedEditableCoordinate.Direction.NEXT,
+						coordinateArgMin);
+			}
 		} else {
 			return null;
 		}
