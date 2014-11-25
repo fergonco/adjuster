@@ -5,24 +5,32 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 public class Adjuster {
-	public static final double TOLERANCE = 100;
+	public static final double TOLERANCE = 10;
 	public static final double ANGLE_TOLERANCE = 0.5;
 
 	public static void main(String[] args) throws MalformedURLException,
 			IOException, InvalidGeometryException {
 
-		Reference reference = new Reference(
-				"coberturas/2006/ch06_wgs84_gkf5.shp");
+		Reference reference = new Reference("coberturas/test-25-nov/merge.shp");
 		// Adjusting adjusting = new Adjusting(
 		// "coberturas/2006_2011/single-testcase.shp", "single-result.shp");
 		// Adjusting adjusting = new Adjusting(
 		// "coberturas/2006_2011/testcase.shp", "result.shp");
 		Adjusting adjusting = new Adjusting(
-				"coberturas/2006_2011/ch_defo_otf_a_ot_2006_2011_f5wgs84_final.shp",
-				"result_100.shp");
+				"coberturas/test-25-nov/tucuman/defo_otf_a_ot_2007_2011_f3wgs84_final.shp",
+				"result_10.shp");
 
+		int i = 0;
 		while (!adjusting.eof()) {
-			EditablePolygon geom = adjusting.next();
+			System.out.println("Processing geometry: " + i);
+			i++;
+			EditablePolygon geom;
+			try {
+				geom = adjusting.next();
+			} catch (EmptyGeometryException e) {
+				System.out.println("JUMPED!!!!");
+				continue;
+			}
 			OrderedEditableCoordinate firstCoordinate = geom
 					.getFirstCoordinate();
 			OrderedEditableCoordinate coordinate = firstCoordinate;

@@ -14,7 +14,8 @@ public class EditablePolygon extends TopologicalPolygon {
 	private FeatureWriter<SimpleFeatureType, SimpleFeature> featureWriter;
 
 	public EditablePolygon(SimpleFeature feature,
-			FeatureWriter<SimpleFeatureType, SimpleFeature> outputFeatureWriter) {
+			FeatureWriter<SimpleFeatureType, SimpleFeature> outputFeatureWriter)
+			throws EmptyGeometryException {
 		super((Geometry) feature.getDefaultGeometry());
 		this.feature = feature;
 		this.featureWriter = outputFeatureWriter;

@@ -16,7 +16,10 @@ public class TopologicalPolygon {
 
 	private OrderedEditableCoordinate firstCoordinate;
 
-	public TopologicalPolygon(Geometry geometry) {
+	public TopologicalPolygon(Geometry geometry) throws EmptyGeometryException {
+		if (geometry.isEmpty()) {
+			throw new EmptyGeometryException();
+		}
 		// Get the external ring of the unique polygon
 		if (geometry instanceof MultiPolygon) {
 			geometry = geometry.getGeometryN(0);
@@ -56,7 +59,7 @@ public class TopologicalPolygon {
 		try {
 			return firstCoordinate.buildPolygon();
 		} catch (InvalidGeometryException e) {
-			// Probably was already wrong at the begining
+			// Probably was already wrong at the beginning
 			return e.getPolygon();
 		}
 	}

@@ -46,7 +46,7 @@ public class Adjusting {
 		return !features.hasNext();
 	}
 
-	public EditablePolygon next() {
+	public EditablePolygon next() throws EmptyGeometryException {
 		SimpleFeature feature = features.next();
 		return new EditablePolygon(feature, outputFeatureWriter);
 	}

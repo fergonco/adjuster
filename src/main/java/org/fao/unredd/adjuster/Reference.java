@@ -57,14 +57,21 @@ public class Reference {
 		}
 
 		if (min < Adjuster.TOLERANCE) {
-			return closestPoint(coordinate, argMin);
+			try {
+				return closestPoint(coordinate, argMin);
+			} catch (EmptyGeometryException e) {
+				// Can never happen because the geometry was selected, hence not
+				// empty
+				throw new RuntimeException();
+			}
 		} else {
 			return null;
 		}
 	}
 
 	private OrderedEditableCoordinate closestPoint(
-			OrderedEditableCoordinate coordinate, Geometry geometry) {
+			OrderedEditableCoordinate coordinate, Geometry geometry)
+			throws EmptyGeometryException {
 		TopologicalPolygon polygon = new TopologicalPolygon(geometry);
 		double min = Double.MAX_VALUE;
 		Coordinate coordinateArgMin = null;
