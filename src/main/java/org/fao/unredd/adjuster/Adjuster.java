@@ -11,14 +11,21 @@ public class Adjuster {
 	public static void main(String[] args) throws MalformedURLException,
 			IOException, InvalidGeometryException {
 
-		Reference reference = new Reference("coberturas/test-25-nov/merge.shp");
+		String referencePath = "coberturas/test-25-nov/merge.shp";
+		String adjustingPath = "coberturas/test-25-nov/tucuman/defo_otf_a_ot_2007_2011_f3wgs84_final.shp";
+		String resultPath = "result.shp";
+
+		adjust(referencePath, adjustingPath, resultPath);
+	}
+
+	public static void adjust(String referencePath, String adjustingPath,
+			String resultPath) throws MalformedURLException, IOException {
+		Reference reference = new Reference(referencePath);
 		// Adjusting adjusting = new Adjusting(
 		// "coberturas/2006_2011/single-testcase.shp", "single-result.shp");
 		// Adjusting adjusting = new Adjusting(
 		// "coberturas/2006_2011/testcase.shp", "result.shp");
-		Adjusting adjusting = new Adjusting(
-				"coberturas/test-25-nov/tucuman/defo_otf_a_ot_2007_2011_f3wgs84_final.shp",
-				"result_10.shp");
+		Adjusting adjusting = new Adjusting(adjustingPath, resultPath);
 
 		int i = 0;
 		while (!adjusting.eof()) {
